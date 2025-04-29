@@ -1,0 +1,26 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block page_title %}Panel de Administración{% endblock %}
+{% block header_title %}Panel de Administración{% endblock %}
+
+{% block accounts_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> 
+                Estás siendo redirigido al panel de administración. Si no eres redirigido automáticamente, 
+                <a href="{% url 'admin:index' %}">haz clic aquí</a>.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Redirección automática después de 3 segundos
+    setTimeout(function() {
+        window.location.href = "{% url 'admin:index' %}";
+    }, 3000);
+</script>
+{% endblock %}

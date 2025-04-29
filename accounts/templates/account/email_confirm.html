@@ -1,0 +1,82 @@
+{% extends "flights/base.html" %}
+{% load i18n %}
+{% load account %}
+
+{% block page_title %}{% trans "Confirmar Correo Electrónico" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .email-confirm-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .email-confirm-icon {
+        font-size: 48px;
+        color: #8e24aa;
+        margin-bottom: 20px;
+    }
+
+    .email-confirm-title {
+        color: #343a40;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .email-confirm-text {
+        color: #6c757d;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .btn-confirm {
+        background-color: #8e24aa;
+        border-color: #8e24aa;
+        padding: 10px 30px;
+        font-weight: 500;
+    }
+
+    .btn-confirm:hover {
+        background-color: #7b1fa2;
+        border-color: #7b1fa2;
+    }
+</style>
+{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="email-confirm-container text-center">
+        <i class="fas fa-envelope-open-text email-confirm-icon"></i>
+        
+        <h2 class="email-confirm-title">{% trans "Confirmar Correo Electrónico" %}</h2>
+        
+        {% if confirmation %}
+            {% user_display confirmation.email_address.user as user_display %}
+            <p class="email-confirm-text">
+                {% blocktrans with confirmation.email_address.email as email %}
+                Por favor, confirma que <strong>{{ email }}</strong> es la dirección de correo electrónico para el usuario {{ user_display }}.
+                {% endblocktrans %}
+            </p>
+
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-confirm">{% trans "Confirmar" %}</button>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                {% url 'account_email' as email_url %}
+                <p class="email-confirm-text">
+                    {% blocktrans %}
+                    Este enlace de confirmación ha expirado o no es válido. Por favor, 
+                    <a href="{{ email_url }}" class="alert-link">solicita una nueva confirmación de correo electrónico</a>.
+                    {% endblocktrans %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

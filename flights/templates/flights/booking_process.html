@@ -1,0 +1,882 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+{% load flight_filters %}
+
+{% block page_title %}Reserva de Vuelo{% endblock %}
+{% block header_title %}Reserva de Vuelo{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Booking Process Styles */
+    .booking-process {
+        margin-bottom: 40px;
+    }
+    
+    .booking-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .booking-steps::before {
+        content: "";
+        position: absolute;
+        top: 24px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #e9ecef;
+        z-index: -1;
+    }
+    
+    .booking-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 25%;
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .step-name {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .booking-step.active .step-number {
+        background-color: #8e24aa;
+        color: white;
+    }
+    
+    .booking-step.active .step-name {
+        color: #8e24aa;
+        font-weight: 600;
+    }
+    
+    .booking-step.completed .step-number {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    /* Flight Selection Styles */
+    .flight-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .flight-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+    }
+    
+    .flight-card .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 20px;
+    }
+    
+    .flight-route {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .flight-city {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .flight-city-code {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #343a40;
+    }
+    
+    .flight-city-name {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .flight-separator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px;
+    }
+    
+    .flight-line {
+        height: 3px;
+        width: 100px;
+        background-color: #dee2e6;
+        position: relative;
+    }
+    
+    .flight-line::before,
+    .flight-line::after {
+        content: "";
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        position: absolute;
+        top: -2.5px;
+    }
+    
+    .flight-line::before {
+        left: -4px;
+    }
+    
+    .flight-line::after {
+        right: -4px;
+    }
+    
+    .flight-duration {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    .flight-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+    }
+    
+    .flight-time-detail {
+        display: flex;
+        align-items: center;
+    }
+    
+    .flight-time {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .flight-date {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .flight-info {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .flight-number {
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .aircraft-info {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .flight-amenities {
+        display: flex;
+        padding: 0 20px 15px;
+    }
+    
+    .amenity {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-right: 15px;
+    }
+    
+    .amenity i {
+        margin-right: 5px;
+        color: #8e24aa;
+    }
+    
+    .flight-price-select {
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .flight-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #8e24aa;
+    }
+    
+    .price-per-person {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Passenger Form Styles */
+    .passenger-form {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .passenger-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .passenger-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #8e24aa;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 15px;
+    }
+    
+    .passenger-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    /* Booking Summary Styles */
+    .booking-summary {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 20px;
+    }
+    
+    .summary-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .summary-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 0;
+    }
+    
+    .summary-body {
+        padding: 15px 20px;
+    }
+    
+    .summary-flight {
+        margin-bottom: 15px;
+    }
+    
+    .summary-route {
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+    
+    .summary-date {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .summary-key {
+        color: #6c757d;
+    }
+    
+    .summary-value {
+        font-weight: 500;
+        color: #343a40;
+    }
+    
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #e9ecef;
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .summary-total-key {
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .summary-total-value {
+        font-weight: 700;
+        color: #8e24aa;
+        font-size: 1.2rem;
+    }
+    
+    .seat-selection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+    
+    .aircraft-cabin {
+        width: 100%;
+        max-width: 600px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .cabin-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .seat-map {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    
+    .row-number {
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .seats {
+        display: flex;
+    }
+    
+    .seat {
+        width: 40px;
+        height: 40px;
+        margin: 0 5px;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #343a40;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .seat:hover {
+        background-color: #e9ecef;
+    }
+    
+    .seat.occupied {
+        background-color: #dee2e6;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    .seat.selected {
+        background-color: #8e24aa;
+        color: white;
+        border-color: #8e24aa;
+    }
+    
+    .seat-legend {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 0 10px;
+    }
+    
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+        margin-right: 5px;
+    }
+    
+    .legend-available {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+    }
+    
+    .legend-occupied {
+        background-color: #dee2e6;
+    }
+    
+    .legend-selected {
+        background-color: #8e24aa;
+    }
+    
+    .legend-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .payment-methods {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    
+    .payment-method {
+        flex: 0 0 calc(33.333% - 10px);
+        margin: 5px;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .payment-method:hover {
+        border-color: #8e24aa;
+    }
+    
+    .payment-method.selected {
+        border-color: #8e24aa;
+        background-color: rgba(142, 36, 170, 0.05);
+    }
+    
+    .payment-method img {
+        height: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .payment-method-name {
+        font-size: 0.9rem;
+        color: #343a40;
+    }
+</style>
+{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="booking-process">
+        <!-- Booking Steps -->
+        <div class="booking-steps">
+            <div class="booking-step {% if step == 1 %}active{% elif step > 1 %}completed{% endif %}">
+                <div class="step-number">{% if step > 1 %}<i class="fas fa-check"></i>{% else %}1{% endif %}</div>
+                <div class="step-name">Selección de vuelo</div>
+            </div>
+            <div class="booking-step {% if step == 2 %}active{% elif step > 2 %}completed{% endif %}">
+                <div class="step-number">{% if step > 2 %}<i class="fas fa-check"></i>{% else %}2{% endif %}</div>
+                <div class="step-name">Asientos</div>
+            </div>
+            <div class="booking-step {% if step == 3 %}active{% elif step > 3 %}completed{% endif %}">
+                <div class="step-number">{% if step > 3 %}<i class="fas fa-check"></i>{% else %}3{% endif %}</div>
+                <div class="step-name">Pasajeros</div>
+            </div>
+            <div class="booking-step {% if step == 4 %}active{% endif %}">
+                <div class="step-number">4</div>
+                <div class="step-name">Pago</div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Flight Selection -->
+        {% if step == 1 %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="mb-4">Selecciona tu vuelo</h3>
+                
+                <div class="flight-card">
+                    <div class="card-header">
+                        <div class="flight-route">
+                            <div class="flight-city">
+                                <div class="flight-city-code">{{ flight.origin.city|slice:":3"|upper }}</div>
+                                <div class="flight-city-name">{{ flight.origin.name }}</div>
+                            </div>
+                            <div class="flight-separator">
+                                <div class="flight-line"></div>
+                                <div class="flight-duration">{{ flight.departure_time|timeuntil:flight.arrival_time }}</div>
+                            </div>
+                            <div class="flight-city">
+                                <div class="flight-city-code">{{ flight.destination.city|slice:":3"|upper }}</div>
+                                <div class="flight-city-name">{{ flight.destination.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flight-details">
+                        <div class="flight-time-detail">
+                            <div class="me-3">
+                                <div class="flight-time">{{ flight.departure_time|date:"H:i" }}</div>
+                                <div class="flight-date">{{ flight.departure_time|date:"d M Y" }}</div>
+                            </div>
+                            <i class="fas fa-plane-departure text-muted"></i>
+                        </div>
+                        <div class="flight-info">
+                            <div class="flight-number">Vuelo MA{{ flight.id }}</div>
+                            <div class="aircraft-info">{{ flight.aircraft.aircraft_type.name }}</div>
+                        </div>
+                        <div class="flight-time-detail">
+                            <i class="fas fa-plane-arrival text-muted me-3"></i>
+                            <div>
+                                <div class="flight-time">{{ flight.arrival_time|date:"H:i" }}</div>
+                                <div class="flight-date">{{ flight.arrival_time|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flight-amenities">
+                        {% if flight.aircraft.aircraft_type.amenities %}
+                            {% for amenity in flight.aircraft.aircraft_type.amenities %}
+                                <div class="amenity">
+                                    <i class="fas fa-check-circle"></i> {{ amenity }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="flight-price-select">
+                        <div>
+                            <div class="flight-price">${{ flight.price|intcomma }}</div>
+                            <div class="price-per-person">por persona</div>
+                        </div>
+                        <form method="post" action="{% url 'flights:booking_process' flight.id 2 %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Seleccionar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Step 2: Seat Selection -->
+        {% if step == 2 %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h3 class="mb-4">Selección de asientos</h3>
+                
+                <div class="seat-selection">
+                    <div class="aircraft-cabin">
+                        <div class="cabin-header">
+                            <h5>{{ flight.aircraft.aircraft_type.name }}</h5>
+                            <p class="text-muted">Please select {{ passengers }} seat(s)</p>
+                        </div>
+                        <div class="seat-map">
+                            {% for row in "12345"|make_list %}
+                            <div class="seat-row">
+                                <div class="row-number">{{ row }}</div>
+                                <div class="seats">
+                                    <div class="seat {% if row == '1' and seat == 'A' %}occupied{% endif %}" data-seat="{{ row }}A">{{ row }}A</div>
+                                    <div class="seat {% if row == '2' and seat == 'B' %}occupied{% endif %}" data-seat="{{ row }}B">{{ row }}B</div>
+                                    <div class="seat {% if row == '3' and seat == 'C' %}occupied{% endif %}" data-seat="{{ row }}C">{{ row }}C</div>
+                                    <div class="seat-spacer"></div>
+                                    <div class="seat {% if row == '1' and seat == 'D' %}occupied{% endif %}" data-seat="{{ row }}D">{{ row }}D</div>
+                                    <div class="seat {% if row == '2' and seat == 'E' %}occupied{% endif %}" data-seat="{{ row }}E">{{ row }}E</div>
+                                    <div class="seat {% if row == '4' and seat == 'F' %}occupied{% endif %}" data-seat="{{ row }}F">{{ row }}F</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="seat-legend">
+                            <div class="legend-item">
+                                <div class="legend-color legend-available"></div>
+                                <div class="legend-text">Available</div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-occupied"></div>
+                                <div class="legend-text">Occupied</div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-selected"></div>
+                                <div class="legend-text">Selected</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post" action="{% url 'flights:booking_process' flight.id 3 %}" id="seat-form" class="mt-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="selected_seats" id="selected-seats" value="{{ selected_seats|join:',' }}">
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg" id="continue-button" disabled>Continue to Passenger Information</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                {% include "flights/includes/booking_summary.html" %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Step 3: Passenger Information -->
+        {% if step == 3 %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h3 class="mb-4">Información de pasajeros</h3>
+                
+                <form method="post" action="{% url 'flights:booking_process' flight.id 4 %}">
+                    {% csrf_token %}
+                    {% for i in passengers_range %}
+                    <div class="passenger-form">
+                        <div class="passenger-header">
+                            <div class="passenger-number">{{ forloop.counter }}</div>
+                            <h5 class="passenger-title">Pasajero {{ forloop.counter }}</h5>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name_{{ forloop.counter }}" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="first_name_{{ forloop.counter }}" name="first_name_{{ forloop.counter }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name_{{ forloop.counter }}" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="last_name_{{ forloop.counter }}" name="last_name_{{ forloop.counter }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="document_type_{{ forloop.counter }}" class="form-label">Tipo de documento</label>
+                                <select class="form-select" id="document_type_{{ forloop.counter }}" name="document_type_{{ forloop.counter }}" required>
+                                    <option value="DNI">DNI</option>
+                                    <option value="PASSPORT">Pasaporte</option>
+                                    <option value="OTHER">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="document_number_{{ forloop.counter }}" class="form-label">Número de documento</label>
+                                <input type="text" class="form-control" id="document_number_{{ forloop.counter }}" name="document_number_{{ forloop.counter }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="birth_date_{{ forloop.counter }}" class="form-label">Fecha de nacimiento</label>
+                                <input type="date" class="form-control" id="birth_date_{{ forloop.counter }}" name="birth_date_{{ forloop.counter }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nationality_{{ forloop.counter }}" class="form-label">Nacionalidad</label>
+                                <input type="text" class="form-control" id="nationality_{{ forloop.counter }}" name="nationality_{{ forloop.counter }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="seat_{{ forloop.counter }}" class="form-label">Asiento asignado</label>
+                                <input type="text" class="form-control" id="seat_{{ forloop.counter }}" name="seat_{{ forloop.counter }}" value="{{ selected_seats|split_list:forloop.counter0 }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Continuar al pago</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="col-md-4">
+                {% include "flights/includes/booking_summary.html" %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Step 4: Payment -->
+        {% if step == 4 %}
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h3 class="mb-4">Método de pago</h3>
+                
+                <div class="payment-methods mb-4">
+                    <div class="payment-method" data-method="credit_card">
+                        <img src="{% static 'images/credit-card.png' %}" alt="Tarjeta de crédito" onerror="this.src='https://via.placeholder.com/120x40?text=Tarjeta+de+Crédito';">
+                        <div class="payment-method-name">Tarjeta de crédito</div>
+                    </div>
+                    <div class="payment-method" data-method="debit_card">
+                        <img src="{% static 'images/debit-card.png' %}" alt="Tarjeta de débito" onerror="this.src='https://via.placeholder.com/120x40?text=Tarjeta+de+Débito';">
+                        <div class="payment-method-name">Tarjeta de débito</div>
+                    </div>
+                    <div class="payment-method" data-method="paypal">
+                        <img src="{% static 'images/paypal.png' %}" alt="PayPal" onerror="this.src='https://via.placeholder.com/120x40?text=PayPal';">
+                        <div class="payment-method-name">PayPal</div>
+                    </div>
+                </div>
+                
+                <div class="card-payment-form">
+                    <form method="post" action="{% url 'flights:booking_confirm' flight.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" id="payment_method" value="credit_card">
+                        
+                        <div class="mb-3">
+                            <label for="card_number" class="form-label">Número de tarjeta</label>
+                            <input type="text" class="form-control" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="card_name" class="form-label">Nombre en la tarjeta</label>
+                                <input type="text" class="form-control" id="card_name" name="card_name" placeholder="NOMBRE APELLIDO" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="card_expiry" class="form-label">Fecha de expiración</label>
+                                <input type="text" class="form-control" id="card_expiry" name="card_expiry" placeholder="MM/AA" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="card_cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="card_cvv" name="card_cvv" placeholder="123" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="save_card" name="save_card">
+                            <label class="form-check-label" for="save_card">Guardar esta tarjeta para futuras compras</label>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a>.</label>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Confirmar y pagar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                {% include "flights/includes/booking_summary.html" %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if step == 2 %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const seatForm = document.getElementById('seat-form');
+        const selectedSeatsInput = document.getElementById('selected-seats');
+        const continueButton = document.getElementById('continue-button');
+        const requiredSeats = parseInt('{{ passengers }}', 10);
+        let selectedSeats = [];
+
+        // Initialize previously selected seats if any
+        if (selectedSeatsInput.value) {
+            selectedSeats = selectedSeatsInput.value.split(',');
+            selectedSeats.forEach(seatNumber => {
+                const seatElement = document.querySelector('[data-seat="' + seatNumber + '"]');
+                if (seatElement) {
+                    seatElement.classList.add('selected');
+                }
+            });
+            updateButtonState();
+        }
+
+        // Add click handlers to all seats
+        document.querySelectorAll('.seat').forEach(seat => {
+            if (!seat.classList.contains('occupied')) {
+                seat.addEventListener('click', function() {
+                    const seatNumber = this.dataset.seat;
+                    
+                    if (this.classList.contains('selected')) {
+                        // Deselect seat
+                        this.classList.remove('selected');
+                        selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+                    } else if (selectedSeats.length < requiredSeats) {
+                        // Select seat if we haven't reached the limit
+                        this.classList.add('selected');
+                        selectedSeats.push(seatNumber);
+                    } else {
+                        alert('You can only select ' + requiredSeats + ' seat(s)');
+                        return;
+                    }
+                    
+                    // Update hidden input and button state
+                    selectedSeatsInput.value = selectedSeats.join(',');
+                    updateButtonState();
+                });
+            }
+        });
+
+        function updateButtonState() {
+            continueButton.disabled = selectedSeats.length !== requiredSeats;
+        }
+
+        // Handle form submission
+        seatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (selectedSeats.length !== requiredSeats) {
+                alert('Please select exactly ' + requiredSeats + ' seat(s) to continue');
+                return;
+            }
+            
+            // If validation passes, submit the form
+            this.submit();
+        });
+    });
+</script>
+{% endif %}
+
+{% if step == 4 %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const paymentMethodInput = document.getElementById('payment_method');
+        
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                // Remove selected class from all methods
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                
+                // Add selected class to clicked method
+                this.classList.add('selected');
+                
+                // Update hidden input
+                paymentMethodInput.value = this.dataset.method;
+            });
+        });
+        
+        // Select the first payment method by default
+        paymentMethods[0].click();
+    });
+</script>
+{% endif %}
+{% endblock %} 

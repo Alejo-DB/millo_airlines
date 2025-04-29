@@ -1,0 +1,43 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Login{% endblock %}
+{% block header_title %}Login{% endblock %}
+
+{% block accounts_content %}
+<div class="container">
+    <div class="row justify-content-center my-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Login</h2>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <p><i class="fas fa-exclamation-circle me-2"></i> Incorrect email or password. Please try again.</p>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <input type="hidden" name="next" value="{{ next }}">
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+                        <p>Don't have an account? <a href="{% url 'accounts:register' %}">Register now</a></p>
+                        <p><a href="{% url 'accounts:resend_verification' %}">Resend verification email</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

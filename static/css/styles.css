@@ -1,0 +1,498 @@
+/* Estilos personalizados para Millo Airlines */
+
+:root {
+    --primary: #8e24aa;
+    --primary-dark: #6a1b9a;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --light: #f8f9fa;
+    --dark: #343a40;
+}
+
+/* Estilos generales */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+.text-vip {
+    color: #c9a540;
+}
+
+.bg-vip {
+    background-color: #c9a540;
+    color: white;
+}
+
+.text-purple {
+    color: #8e24aa;
+}
+
+.bg-purple {
+    background-color: #8e24aa;
+    color: white;
+}
+
+/* Header y navegación */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #fff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    padding: 0.7rem 1rem;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #fff;
+}
+
+/* Cards con sombra mejorada */
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Botones personalizados */
+.btn {
+    border-radius: 5px;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(142, 36, 170, 0.2);
+}
+
+/* Efectos en imágenes */
+.destination-image {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Footer */
+footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 3rem 0;
+    margin-top: 3rem;
+}
+
+footer h5 {
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+}
+
+footer a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Efecto parallax para imágenes de destino */
+.parallax-container {
+    height: 400px;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dashboard cards */
+.stat-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .card-body {
+    padding: 1.5rem;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+}
+
+/* Animaciones */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+        height: auto;
+    }
+    
+    .parallax-container {
+        height: 250px;
+        background-attachment: scroll;
+    }
+}
+
+/* Mejoras en componentes de Bootstrap */
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(142, 36, 170, 0.15);
+    border-color: var(--primary);
+}
+
+/* Progress bar personalizada */
+.progress {
+    height: 10px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 5px;
+}
+
+/* Tabla mejorada */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(142, 36, 170, 0.05);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(142, 36, 170, 0.1);
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    border-radius: 5px;
+}
+
+/* Alertas personalizadas */
+.alert {
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.alert-primary {
+    background-color: rgba(142, 36, 170, 0.1);
+    color: #6a1b9a;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #856404;
+}
+
+.alert-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: #0c5460;
+}
+
+/* Modales */
+.modal-content {
+    border-radius: 10px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--primary);
+    color: white;
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+/* Responsive ajustes */
+@media (max-width: 767px) {
+    body {
+        font-size: 0.95rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .search-card {
+        margin-top: -20px;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+    }
+    
+    .card {
+        background-color: #2a2a2a;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bg-light {
+        background-color: #333 !important;
+    }
+    
+    .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    .card-header, .card-footer {
+        background-color: #252525;
+        border-color: #333;
+    }
+    
+    .card-body {
+        border-color: #333;
+    }
+    
+    .form-control, .form-select {
+        background-color: #333;
+        border-color: #444;
+        color: #f0f0f0;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #3a3a3a;
+        color: #f0f0f0;
+    }
+    
+    .btn-outline-primary {
+        color: #8ab4f8;
+        border-color: #8ab4f8;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #8ab4f8;
+        color: #1a1a1a;
+    }
+    
+    .btn-primary {
+        background-color: #8ab4f8;
+        border-color: #8ab4f8;
+        color: #1a1a1a;
+    }
+    
+    .btn-primary:hover {
+        background-color: #6ca0f8;
+        border-color: #6ca0f8;
+    }
+    
+    .table thead th {
+        background-color: #333;
+    }
+    
+    .table tbody tr:nth-child(odd) {
+        background-color: #2a2a2a;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #333;
+    }
+    
+    .alert-primary {
+        background-color: rgba(138, 180, 248, 0.15);
+        color: #8ab4f8;
+    }
+    
+    .alert-success {
+        background-color: rgba(120, 177, 89, 0.15);
+        color: #78b159;
+    }
+    
+    .alert-danger {
+        background-color: rgba(225, 83, 97, 0.15);
+        color: #e15361;
+    }
+    
+    .alert-warning {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+    
+    .alert-info {
+        background-color: rgba(83, 190, 225, 0.15);
+        color: #53bee1;
+    }
+    
+    .destination-image {
+        border-color: #333;
+    }
+    
+    footer {
+        background-color: #1a1a1a;
+        border-color: #333;
+    }
+}
+
+/* Estilos para las tarjetas de información en el perfil */
+.info-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.info-card .card-header {
+    border: none;
+    padding: 1.2rem 1.5rem;
+}
+
+.info-card .card-body {
+    padding: 1.5rem;
+}
+
+.avatar-xxl {
+    width: 150px;
+    height: 150px;
+    font-size: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border: 5px solid white;
+}
+
+.avatar-xl {
+    width: 100px;
+    height: 100px;
+    font-size: 36px;
+}
+
+.avatar-lg {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+}
+
+.avatar-md {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+}
+
+.status-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-online {
+    background-color: #28a745;
+}
+
+.status-offline {
+    background-color: #dc3545;
+}
+
+.status-away {
+    background-color: #ffc107;
+}
+
+/* Ajustes para selección de destinos */
+.destination-checkbox:checked + label .preference-card {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+/* Seat layout styles */
+.seat-spacer {
+    width: 20px;
+    display: inline-block;
+} 

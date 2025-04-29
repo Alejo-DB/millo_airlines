@@ -1,0 +1,124 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block page_title %}Reportes{% endblock %}
+{% block header_title %}Reportes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stats-card h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #8e24aa;
+    }
+    
+    .stats-card p {
+        margin: 5px 0 0;
+        color: #666;
+    }
+    
+    .chart-container {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row">
+        <!-- Estadísticas generales -->
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ total_flights }}</h3>
+                <p>Vuelos totales</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>{{ total_bookings }}</h3>
+                <p>Reservas totales</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3>${{ total_revenue|intcomma }}</h3>
+                <p>Ingresos totales</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Rutas populares -->
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4 class="mb-4">Rutas más populares</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ruta</th>
+                                <th>Reservas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for route in popular_routes %}
+                            <tr>
+                                <td>{{ route.origin__name }} → {{ route.destination__name }}</td>
+                                <td>{{ route.total_bookings }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center">No hay datos disponibles</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingresos mensuales -->
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h4 class="mb-4">Ingresos mensuales</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month in monthly_revenue %}
+                            <tr>
+                                <td>{{ month.month|date:"F Y" }}</td>
+                                <td>${{ month.revenue|intcomma }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center">No hay datos disponibles</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

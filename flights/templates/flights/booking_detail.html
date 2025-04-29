@@ -1,0 +1,139 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block page_title %}Booking Details{% endblock %}
+{% block header_title %}Booking Details{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Booking #{{ booking.uuid|truncatechars:8 }}</h5>
+                        <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'CONFIRMED' %}bg-success{% elif booking.status == 'COMPLETED' %}bg-secondary{% else %}bg-danger{% endif %}">
+                            {{ booking.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Flight Information</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ booking.flight.origin.city }} → {{ booking.flight.destination.city }}</h5>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Origin:</strong> {{ booking.flight.origin.name }}</p>
+                                            <p class="mb-0 text-muted">{{ booking.flight.origin.city }}, {{ booking.flight.origin.country }}</p>
+                                            <p class="mb-0"><strong>Departure:</strong> {{ booking.flight.departure_time|date:"d/m/Y H:i" }}</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Destination:</strong> {{ booking.flight.destination.name }}</p>
+                                            <p class="mb-0 text-muted">{{ booking.flight.destination.city }}, {{ booking.flight.destination.country }}</p>
+                                            <p class="mb-0"><strong>Arrival:</strong> {{ booking.flight.arrival_time|date:"d/m/Y H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <p class="mb-0"><strong>Aircraft:</strong> {{ booking.flight.aircraft.aircraft_type.name }} ({{ booking.flight.aircraft.registration }})</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Booking Details</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <p class="mb-2"><strong>Booking date:</strong> {{ booking.created_at|date:"d/m/Y H:i" }}</p>
+                                    <p class="mb-2"><strong>Passengers:</strong> {{ booking.passengers }}</p>
+                                    <p class="mb-2"><strong>Total price:</strong> ${{ booking.total_price|intcomma }}</p>
+                                    <p class="mb-2">
+                                        <strong>Payment status:</strong>
+                                        <span class="badge {% if booking.payment_status %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ booking.payment_status|yesno:"Paid,Pending" }}
+                                        </span>
+                                    </p>
+                                    {% if booking.payment_date %}
+                                    <p class="mb-2"><strong>Payment date:</strong> {{ booking.payment_date|date:"d/m/Y H:i" }}</p>
+                                    {% endif %}
+                                    {% if booking.special_requests %}
+                                    <p class="mb-0"><strong>Special requests:</strong> {{ booking.special_requests }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if booking.status == 'CONFIRMED' and not booking.payment_status %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            {% include "flights/includes/alert.html" with message="This booking is confirmed but payment is pending. Please complete the payment to secure your booking." type="warning" %}
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'flights:payment' booking.uuid %}" class="btn btn-primary">Proceed to Payment</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if booking.status == 'PENDING' %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            {% include "flights/includes/alert.html" with message="This booking is pending confirmation. You will receive an email once it is confirmed." type="info" %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if booking.status == 'CANCELLED' %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            {% include "flights/includes/alert.html" with message="This booking has been cancelled." type="danger" %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-between">
+                            <a href="{% url 'flights:user_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                            
+                            {% if booking.status == 'CONFIRMED' or booking.status == 'PENDING' %}
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                Cancel Booking
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if booking.status == 'CONFIRMED' or booking.status == 'PENDING' %}
+<!-- Cancellation confirmation modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Confirm Cancellation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                {% if booking.status == 'CONFIRMED' and booking.payment_status %}
+                <p><strong>Note:</strong> Cancellation fees may apply according to our policies.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form method="post" action="{% url 'flights:cancel_booking' booking.uuid %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

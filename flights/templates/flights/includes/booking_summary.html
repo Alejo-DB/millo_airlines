@@ -1,0 +1,46 @@
+{% load humanize %}
+{% load flight_filters %}
+
+<div class="booking-summary">
+    <div class="summary-header">
+        <h5 class="summary-title">Resumen de la reserva</h5>
+    </div>
+    <div class="summary-body">
+        <div class="summary-flight">
+            <div class="summary-route">{{ flight.origin.city }} → {{ flight.destination.city }}</div>
+            <div class="summary-date">{{ flight.departure_time|date:"d M Y" }}</div>
+        </div>
+        
+        <div class="summary-item">
+            <div class="summary-key">Vuelo</div>
+            <div class="summary-value">MA{{ flight.id }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-key">Hora de salida</div>
+            <div class="summary-value">{{ flight.departure_time|date:"H:i" }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-key">Hora de llegada</div>
+            <div class="summary-value">{{ flight.arrival_time|date:"H:i" }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-key">Pasajeros</div>
+            <div class="summary-value">{{ passengers }}</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-key">Precio por pasajero</div>
+            <div class="summary-value">${{ flight.price|intcomma }}</div>
+        </div>
+        {% if selected_seats %}
+        <div class="summary-item">
+            <div class="summary-key">Asientos</div>
+            <div class="summary-value">{{ selected_seats }}</div>
+        </div>
+        {% endif %}
+        
+        <div class="summary-total">
+            <div class="summary-total-key">Total</div>
+            <div class="summary-total-value">${{ total_price|default:flight.price|multiply:passengers|intcomma }}</div>
+        </div>
+    </div>
+</div> 

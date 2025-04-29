@@ -1,0 +1,226 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+{% load flight_filters %}
+
+{% block page_title %}My Dashboard{% endblock %}
+{% block header_title %}My Dashboard{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <!-- User Information -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3 user-avatar">
+                            {{ user.get_initials }}
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ user.get_full_name|default:user.email }}</h4>
+                            <p class="text-muted mb-0">{{ user.email }} - VIP Level: {{ user.vip_level }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <p class="mb-1">VIP Level</p>
+                            {% include "flights/includes/progress_bar.html" with value=user.vip_level max_value=5 color="primary" %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="d-flex flex-column text-center">
+                                <span class="fs-4 fw-bold text-primary">{{ active_bookings|length }}</span>
+                                <span class="text-muted">Active Bookings</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="d-flex flex-column text-center">
+                                <span class="fs-4 fw-bold text-primary">{{ past_bookings|length }}</span>
+                                <span class="text-muted">Past Bookings</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user me-2"></i>My Profile
+                            </a>
+                            <a href="{% url 'flights:update_preferences' %}" class="btn btn-outline-primary ms-2">
+                                <i class="fas fa-cog me-2"></i>Preferences
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Bookings -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <h3 class="mb-0">Active Bookings</h3>
+                <span class="badge bg-primary rounded-pill ms-2">{{ active_bookings|length }}</span>
+            </div>
+            {% if active_bookings %}
+                {% for booking in active_bookings %}
+                {% include "flights/includes/booking_card.html" with booking=booking is_past=False %}
+                {% endfor %}
+            {% else %}
+                {% include "flights/includes/alert.html" with message="You have no active bookings at the moment." type="info" %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Booking History -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <h3 class="mb-0">Booking History</h3>
+                <span class="badge bg-secondary rounded-pill ms-2">{{ past_bookings|length }}</span>
+            </div>
+            {% if past_bookings %}
+                {% for booking in past_bookings %}
+                {% include "flights/includes/booking_card.html" with booking=booking is_past=True %}
+                {% endfor %}
+            {% else %}
+                {% include "flights/includes/alert.html" with message="You have no past bookings." type="info" %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Preferred Destinations -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center">
+                    <h3 class="mb-0">Your Preferred Destinations</h3>
+                    {% if preferred_destinations %}
+                    <span class="badge bg-success rounded-pill ms-2">{{ preferred_destinations|length }}</span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'flights:update_preferences' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit me-1"></i>Edit
+                </a>
+            </div>
+            <div class="row">
+                {% if preferred_destinations %}
+                    {% for destination in preferred_destinations %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm destination-card">
+                            <div class="position-relative">
+                                {% if destination.image %}
+                                <img src="{{ destination.image.url }}" class="card-img-top destination-img" alt="{{ destination.name }}">
+                                <div class="destination-overlay"></div>
+                                {% else %}
+                                <div class="card-img-top bg-light text-center py-5">
+                                    <i class="fas fa-map-marker-alt fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="country-badge">
+                                    <span class="badge bg-light text-dark">{{ destination.country }}</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title mb-1">{{ destination.name }}</h5>
+                                <p class="card-text text-muted mb-1">{{ destination.city }}</p>
+                                {% if destination.description %}
+                                <p class="card-text"><small class="text-muted">{{ destination.description|truncatewords:15 }}</small></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You haven't selected any preferred destinations. 
+                            <a href="{% url 'flights:update_preferences' %}" class="alert-link">Update your preferences</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animated-result {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .destination-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .destination-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .destination-img {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .destination-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .destination-card:hover .destination-overlay {
+        opacity: 1;
+    }
+    
+    .country-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+    }
+    
+    .action-btn {
+        margin: 0 5px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #8e24aa;
+        color: #8e24aa;
+    }
+    
+    .delay-1 { animation-delay: 100ms; }
+    .delay-2 { animation-delay: 200ms; }
+    .delay-3 { animation-delay: 300ms; }
+    .delay-4 { animation-delay: 400ms; }
+    .delay-5 { animation-delay: 500ms; }
+    .delay-6 { animation-delay: 600ms; }
+    .delay-7 { animation-delay: 700ms; }
+    .delay-8 { animation-delay: 800ms; }
+    .delay-9 { animation-delay: 900ms; }
+</style>
+{% endblock %} 

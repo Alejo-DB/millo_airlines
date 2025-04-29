@@ -1,0 +1,44 @@
+{% comment %}
+Reusable booking card component
+Usage: 
+{% include "flights/includes/booking_card.html" with booking=booking is_past=False %}
+
+Parameters:
+- booking: booking object to display
+- is_past: (optional) if it's a past booking (true/false, default false)
+{% endcomment %}
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <h5 class="card-title">{{ booking.flight.origin.city }} → {{ booking.flight.destination.city }}</h5>
+                <p class="card-text text-muted">{{ booking.flight.departure_time|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="col-md-2">
+                {% if is_past %}
+                <span class="badge {% if booking.status == 'COMPLETED' %}bg-secondary{% else %}bg-danger{% endif %}">
+                {% else %}
+                <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'CONFIRMED' %}bg-success{% else %}bg-danger{% endif %}">
+                {% endif %}
+                    {{ booking.get_status_display }}
+                </span>
+            </div>
+            <div class="col-md-2">
+                <strong>{{ booking.passengers }}</strong> passengers
+            </div>
+            <div class="col-md-2">
+                {% if is_past %}
+                <span class="text-muted">{{ booking.created_at|date:"d/m/Y" }}</span>
+                {% else %}
+                <span class="badge {% if booking.payment_status %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ booking.payment_status|yesno:"Paid,Pending" }}
+                </span>
+                {% endif %}
+            </div>
+            <div class="col-md-2 text-end">
+                <a href="{% url 'flights:booking_detail' booking.uuid %}" class="btn btn-sm btn-outline-{% if is_past %}secondary{% else %}primary{% endif %}">View details</a>
+            </div>
+        </div>
+    </div>
+</div>

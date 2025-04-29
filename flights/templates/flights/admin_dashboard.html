@@ -1,0 +1,235 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block page_title %}Panel de Administración{% endblock %}
+{% block header_title %}Panel de Administración{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.2s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    .stats-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+    .quick-action-btn {
+        border-radius: 10px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .quick-action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    .stats-value {
+        font-size: 2.5rem;
+        font-weight: 600;
+    }
+    .stats-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    .stats-link {
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+    .stats-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block flights_content %}
+<div class="container py-4">
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stats-label mb-1">Total Vuelos</p>
+                            <h2 class="stats-value mb-2">{{ total_flights }}</h2>
+                            <a href="{% url 'flights:admin_flight_list' %}" class="stats-link text-white">
+                                Ver Detalles <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stats-label mb-1">Reservas Activas</p>
+                            <h2 class="stats-value mb-2">{{ active_bookings }}</h2>
+                            <a href="#" class="stats-link text-white">
+                                Ver Detalles <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card bg-gradient-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stats-label mb-1">Total Usuarios</p>
+                            <h2 class="stats-value mb-2">{{ total_users }}</h2>
+                            <a href="#" class="stats-link text-white">
+                                Ver Detalles <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Acciones Rápidas</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <a href="{% url 'flights:admin_flight_create' %}" class="btn btn-primary quick-action-btn w-100">
+                        <i class="fas fa-plus me-2"></i>Agregar Vuelo
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'flights:manage_destinations' %}" class="btn btn-success quick-action-btn w-100">
+                        <i class="fas fa-map-marker-alt me-2"></i>Gestionar Destinos
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'flights:manage_aircraft' %}" class="btn btn-info quick-action-btn w-100 text-white">
+                        <i class="fas fa-plane me-2"></i>Gestionar Aeronaves
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'flights:view_reports' %}" class="btn btn-warning quick-action-btn w-100">
+                        <i class="fas fa-chart-bar me-2"></i>Ver Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Data -->
+    <div class="row g-4">
+        <!-- Upcoming Flights -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Próximos Vuelos</h5>
+                    <a href="{% url 'flights:admin_flight_list' %}" class="btn btn-sm btn-primary">
+                        Ver Todos
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Vuelo</th>
+                                    <th>Ruta</th>
+                                    <th>Fecha</th>
+                                    <th class="pe-3">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for flight in upcoming_flights %}
+                                <tr>
+                                    <td class="ps-3">MA{{ flight.id }}</td>
+                                    <td>{{ flight.origin.city|slice:":3"|upper }} → {{ flight.destination.city|slice:":3"|upper }}</td>
+                                    <td>{{ flight.departure_time|date:"d/m/Y H:i" }}</td>
+                                    <td class="pe-3">
+                                        <span class="badge {% if flight.status == 'SCHEDULED' %}bg-primary{% elif flight.status == 'CONFIRMED' %}bg-warning{% elif flight.status == 'IN_PROGRESS' %}bg-info{% elif flight.status == 'COMPLETED' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ flight.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">No hay vuelos próximos.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Reservas Recientes</h5>
+                    <a href="#" class="btn btn-sm btn-primary">
+                        Ver Todas
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Referencia</th>
+                                    <th>Usuario</th>
+                                    <th>Vuelo</th>
+                                    <th class="pe-3">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                <tr>
+                                    <td class="ps-3">{{ booking.booking_reference }}</td>
+                                    <td>{{ booking.user.email }}</td>
+                                    <td>MA{{ booking.flight.id }}</td>
+                                    <td class="pe-3">
+                                        <span class="badge {% if booking.status == 'CONFIRMED' %}bg-success{% elif booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'CANCELLED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">No hay reservas recientes.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

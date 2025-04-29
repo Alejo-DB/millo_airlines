@@ -1,0 +1,96 @@
+{% extends "flights/base.html" %}
+{% load static %}
+
+{% block page_title %}{% if destination %}Editar Destino{% else %}Crear Destino{% endif %}{% endblock %}
+{% block header_title %}{% if destination %}Editar Destino{% else %}Crear Destino{% endif %}{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">{% if destination %}Editar Destino{% else %}Crear Nuevo Destino{% endif %}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre del Aeropuerto</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ destination.name|default:'' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese el nombre del aeropuerto.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="city" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control" id="city" name="city" 
+                                   value="{{ destination.city|default:'' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese la ciudad.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="country" class="form-label">País</label>
+                            <input type="text" class="form-control" id="country" name="country" 
+                                   value="{{ destination.country|default:'' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese el país.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="airport_code" class="form-label">Código de Aeropuerto</label>
+                            <input type="text" class="form-control" id="airport_code" name="airport_code" 
+                                   value="{{ destination.airport_code|default:'' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese el código del aeropuerto.
+                            </div>
+                        </div>
+                        
+                        {% if destination %}
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
+                                       {% if destination.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">Destino Activo</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'flights:manage_destinations' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if destination %}Guardar Cambios{% else %}Crear Destino{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
+{% endblock %} 

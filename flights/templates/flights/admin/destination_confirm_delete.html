@@ -1,0 +1,56 @@
+{% extends "flights/base.html" %}
+{% load static %}
+
+{% block page_title %}Eliminar Destino{% endblock %}
+{% block header_title %}Eliminar Destino{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <p class="mb-4">
+                        ¿Está seguro que desea eliminar el siguiente destino?
+                    </p>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ destination.name }}</h5>
+                            <p class="card-text">
+                                <strong>Ciudad:</strong> {{ destination.city }}<br>
+                                <strong>País:</strong> {{ destination.country }}<br>
+                                <strong>Código:</strong> {{ destination.airport_code }}<br>
+                                <strong>Estado:</strong> 
+                                <span class="badge {% if destination.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ destination.is_active|yesno:"Activo,Inactivo" }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'flights:manage_destinations' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Sí, Eliminar Destino
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

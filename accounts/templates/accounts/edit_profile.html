@@ -1,0 +1,140 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Edit Profile{% endblock %}
+{% block header_title %}Edit Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-form-container {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .form-section-title {
+        margin-bottom: 20px;
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .btn-save {
+        padding: 10px 30px;
+        font-weight: 500;
+    }
+    
+    .btn-cancel {
+        padding: 10px 30px;
+        font-weight: 500;
+    }
+    
+    .field-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 767px) {
+        .profile-form-container {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block accounts_content %}
+<div class="container">
+    <div class="row justify-content-center my-4">
+        <div class="col-lg-8">
+            <div class="card profile-form-container">
+                <h2 class="mb-4 text-center">Update Your Profile</h2>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h4 class="form-section-title">Personal Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 field-group">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 field-group">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 field-group">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 field-group">
+                                {{ form.phone|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 field-group">
+                                {{ form.birth_date|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if form.user_type %}
+                    <div class="form-section mt-4">
+                        <h4 class="form-section-title">Account Type</h4>
+                        <div class="row">
+                            <div class="col-12 field-group">
+                                {{ form.user_type|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar fecha de nacimiento
+        const birthDateField = document.getElementById('id_birth_date');
+        if (birthDateField) {
+            birthDateField.classList.add('form-control');
+            birthDateField.setAttribute('type', 'date');
+            
+            // Calcular fecha máxima (hoy) y fecha mínima (120 años atrás)
+            const today = new Date();
+            const minDate = new Date();
+            minDate.setFullYear(today.getFullYear() - 120);
+            
+            // Establecer atributos min y max
+            birthDateField.setAttribute('max', today.toISOString().split('T')[0]);
+            birthDateField.setAttribute('min', minDate.toISOString().split('T')[0]);
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,43 @@
+{% comment %}
+Reusable alert component
+Usage: 
+{% include "flights/includes/alert.html" with message="Message to display" type="info" %}
+
+Parameters:
+- message: message to display
+- type: alert type (info, success, warning, danger)
+- dismissible: (optional) if it can be closed (true/false, default false)
+{% endcomment %}
+
+{% if not type %}
+    {% with type="info" %}{% endwith %}
+{% endif %}
+
+{% if dismissible %}
+<div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+    {% if type == 'info' %}
+    <i class="fas fa-info-circle me-2"></i>
+    {% elif type == 'success' %}
+    <i class="fas fa-check-circle me-2"></i>
+    {% elif type == 'warning' %}
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {% elif type == 'danger' %}
+    <i class="fas fa-times-circle me-2"></i>
+    {% endif %}
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% else %}
+<div class="alert alert-{{ type }}" role="alert">
+    {% if type == 'info' %}
+    <i class="fas fa-info-circle me-2"></i>
+    {% elif type == 'success' %}
+    <i class="fas fa-check-circle me-2"></i>
+    {% elif type == 'warning' %}
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {% elif type == 'danger' %}
+    <i class="fas fa-times-circle me-2"></i>
+    {% endif %}
+    {{ message }}
+</div>
+{% endif %} 

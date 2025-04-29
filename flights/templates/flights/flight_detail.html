@@ -1,0 +1,123 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block page_title %}Flight Details{% endblock %}
+{% block header_title %}Flight Details{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="card-title mb-3">{{ flight.origin.city }} → {{ flight.destination.city }}</h3>
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="me-5">
+                                    <p class="mb-0"><strong>Origin:</strong> {{ flight.origin.name }}</p>
+                                    <p class="mb-0 text-muted">{{ flight.origin.city }}, {{ flight.origin.country }}</p>
+                                    <p class="mb-0"><strong>Date and time:</strong> {{ flight.departure_time|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div>
+                                    <p class="mb-0"><strong>Destination:</strong> {{ flight.destination.name }}</p>
+                                    <p class="mb-0 text-muted">{{ flight.destination.city }}, {{ flight.destination.country }}</p>
+                                    <p class="mb-0"><strong>Date and time:</strong> {{ flight.arrival_time|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                            
+                            <h5>Aircraft Details</h5>
+                            <p class="mb-0"><strong>Type:</strong> {{ flight.aircraft.aircraft_type.name }} ({{ flight.aircraft.aircraft_type.get_category_display }})</p>
+                            <p class="mb-0"><strong>Capacity:</strong> {{ flight.aircraft.aircraft_type.capacity }} passengers</p>
+                            <p class="mb-0"><strong>Registration:</strong> {{ flight.aircraft.registration }}</p>
+                            
+                            {% if flight.aircraft.aircraft_type.amenities %}
+                            <h5 class="mt-3">Amenities</h5>
+                            {% spaceless %}
+                            <ul>{% for amenity in flight.aircraft.aircraft_type.amenities %}<li>{{ amenity }}</li>{% endfor %}</ul>
+                            {% endspaceless %}
+                            {% endif %}
+                            
+                            {% if flight.special_services %}
+                            <h5 class="mt-3">Special Services</h5>
+                            {% spaceless %}
+                            <ul>{% for service in flight.special_services %}<li>{{ service }}</li>{% endfor %}</ul>
+                            {% endspaceless %}
+                            {% endif %}
+                            
+                            {% if flight.notes %}
+                            <h5 class="mt-3">Notes</h5>
+                            {% spaceless %}
+                            <p>{{ flight.notes }}</p>
+                            {% endspaceless %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 border-start">
+                            <div class="text-center mb-4">
+                                <h4 class="text-primary mb-1">${{ flight.price|intcomma }}</h4>
+                                <p class="text-muted">per person</p>
+                                <span class="badge {% if flight.status == 'SCHEDULED' %}bg-info{% elif flight.status == 'CONFIRMED' %}bg-success{% elif flight.status == 'IN_PROGRESS' %}bg-warning{% elif flight.status == 'COMPLETED' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ flight.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Availability</h5>
+                                <p class="mb-1"><strong>Available seats:</strong> {{ flight.available_seats }}</p>
+                                <p class="mb-1"><strong>Total capacity:</strong> {{ flight.aircraft.aircraft_type.capacity }}</p>
+                                {% include "flights/includes/progress_bar.html" with value=flight.available_seats max_value=flight.aircraft.aircraft_type.capacity color="success" %}
+                            </div>
+                            
+                            {% if user.is_authenticated and flight.available_seats > 0 and flight.status == 'SCHEDULED' or flight.status == 'CONFIRMED' %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Book this flight</h5>
+                                    <form method="post" action="{% url 'flights:book_flight' flight.id %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="id_passengers" class="form-label">Number of passengers</label>
+                                            {{ booking_form.passengers }}
+                                            {% if booking_form.passengers.help_text %}
+                                            <small class="form-text text-muted">{{ booking_form.passengers.help_text }}</small>
+                                            {% endif %}
+                                            {% if booking_form.passengers.errors %}
+                                            <div class="invalid-feedback d-block">{{ booking_form.passengers.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="id_special_requests" class="form-label">Special requests</label>
+                                            {{ booking_form.special_requests }}
+                                            {% if booking_form.special_requests.errors %}
+                                            <div class="invalid-feedback d-block">{{ booking_form.special_requests.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary">Continue with booking</button>
+                                        </div>
+                                    </form>
+                                    
+                                    <div class="text-center mt-3">
+                                        <p>Or try our enhanced booking experience</p>
+                                        <a href="{% url 'flights:booking_process' flight.id 1 %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-plane me-2"></i>New booking experience
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% elif flight.available_seats == 0 %}
+                            {% include "flights/includes/alert.html" with message="No seats available for this flight." type="warning" %}
+                            {% elif flight.status != 'SCHEDULED' and flight.status != 'CONFIRMED' %}
+                            {% include "flights/includes/alert.html" with message="This flight is not available for booking at this time." type="info" %}
+                            {% elif not user.is_authenticated %}
+                            {% include "flights/includes/alert.html" with message="You need to log in to book this flight." type="info" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,128 @@
+{% extends "flights/base.html" %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.origin.id_for_label }}" class="form-label">Origen</label>
+                                {{ form.origin }}
+                                {% if form.origin.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.origin.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.destination.id_for_label }}" class="form-label">Destino</label>
+                                {{ form.destination }}
+                                {% if form.destination.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.destination.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.departure_time.id_for_label }}" class="form-label">Fecha y Hora de Salida</label>
+                                {{ form.departure_time }}
+                                {% if form.departure_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.departure_time.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.arrival_time.id_for_label }}" class="form-label">Fecha y Hora de Llegada</label>
+                                {{ form.arrival_time }}
+                                {% if form.arrival_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.arrival_time.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.aircraft.id_for_label }}" class="form-label">Avión</label>
+                                {{ form.aircraft }}
+                                {% if form.aircraft.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.aircraft.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.price.id_for_label }}" class="form-label">Precio</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.price }}
+                                </div>
+                                {% if form.price.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.price.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Estado</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.status.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'flights:admin_flight_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

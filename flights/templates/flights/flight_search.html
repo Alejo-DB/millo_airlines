@@ -1,0 +1,341 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+{% load flight_filters %}
+
+{% block page_title %}Flight Search{% endblock %}
+{% block header_title %}Flight Search{% endblock %}
+
+{% block extra_css %}
+<style>
+    .flight-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid #6a1b9a;
+        margin-bottom: 20px;
+    }
+    
+    .flight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(106, 27, 154, 0.2) !important;
+    }
+    
+    .flight-path {
+        position: relative;
+        height: 2px;
+        background-color: #e9ecef;
+        margin: 15px 0;
+    }
+    
+    .flight-path:after {
+        content: '✈';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #8e24aa;
+        font-size: 20px;
+    }
+    
+    .search-heading {
+        background: linear-gradient(135deg, #8e24aa 0%, #6a1b9a 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 10px rgba(106, 27, 154, 0.2);
+    }
+    
+    .filter-badge {
+        background-color: #f3e5f5;
+        border: 1px solid #e1bee7;
+        border-radius: 20px;
+        padding: 8px 15px;
+        margin-right: 12px;
+        color: #6a1b9a;
+        display: inline-block;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    
+    .price-tag {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .search-card {
+        border-top: 4px solid #8e24aa;
+        margin-bottom: 30px;
+        border-radius: 12px;
+    }
+    
+    /* Animación para los resultados */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animated-result {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    
+    /* Delays para animaciones */
+    .delay-0 { animation-delay: 0ms; }
+    .delay-1 { animation-delay: 100ms; }
+    .delay-2 { animation-delay: 200ms; }
+    .delay-3 { animation-delay: 300ms; }
+    .delay-4 { animation-delay: 400ms; }
+    .delay-5 { animation-delay: 500ms; }
+    .delay-6 { animation-delay: 600ms; }
+    .delay-7 { animation-delay: 700ms; }
+    .delay-8 { animation-delay: 800ms; }
+    .delay-9 { animation-delay: 900ms; }
+    
+    /* Iconos de avión y helicóptero */
+    .vehicle-icon {
+        font-size: 2.2rem;
+        color: #8e24aa;
+    }
+    
+    /* Iconos con tamaños y colores específicos */
+    .icon-search-minus {
+        font-size: 3.5rem;
+        color: #9c27b0;
+    }
+    
+    .icon-feature {
+        font-size: 2.2rem;
+        color: #8e24aa;
+    }
+    
+    /* Estilos para mensajes vacíos */
+    .empty-state {
+        text-align: center;
+        padding: 60px 30px;
+        background-color: #f9f4fc;
+        border-radius: 12px;
+        margin: 30px 0;
+        box-shadow: 0 6px 15px rgba(106, 27, 154, 0.1);
+    }
+    
+    .empty-state i {
+        font-size: 4.5rem;
+        color: #9c27b0;
+        margin-bottom: 25px;
+    }
+    
+    .btn-primary {
+        background-color: #8e24aa;
+        border-color: #8e24aa;
+    }
+    
+    .btn-primary:hover {
+        background-color: #6a1b9a;
+        border-color: #6a1b9a;
+        box-shadow: 0 4px 8px rgba(106, 27, 154, 0.3);
+    }
+    
+    .btn-outline-primary {
+        color: #8e24aa;
+        border-color: #8e24aa;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #8e24aa;
+        border-color: #8e24aa;
+    }
+    
+    .form-select:focus, .form-control:focus {
+        border-color: #8e24aa;
+        box-shadow: 0 0 0 0.25rem rgba(142, 36, 170, 0.25);
+    }
+    
+    .suggestion-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .suggestion-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(106, 27, 154, 0.15) !important;
+    }
+</style>
+{% endblock %}
+
+{% block flights_content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm search-card">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4"><i class="fas fa-search me-2"></i>Search Flights</h4>
+                    <form method="get" action="{% url 'flights:flight_search' %}" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="id_origin" class="form-label">
+                                <i class="fas fa-plane-departure me-1"></i> Origin
+                            </label>
+                            {{ form.origin }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="id_destination" class="form-label">
+                                <i class="fas fa-plane-arrival me-1"></i> Destination
+                            </label>
+                            {{ form.destination }}
+                        </div>
+                        <div class="col-md-2">
+                            <label for="id_departure_date" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i> Date
+                            </label>
+                            {{ form.departure_date }}
+                        </div>
+                        <div class="col-md-2">
+                            <label for="id_passengers" class="form-label">
+                                <i class="fas fa-users me-1"></i> Passengers
+                            </label>
+                            {{ form.passengers }}
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100 py-2" aria-label="Search flights">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if form.is_valid %}
+    <div class="row">
+        <div class="col-12">
+            {% if flights %}
+            <div class="search-heading">
+                <h3 class="mb-2"><i class="fas fa-list me-2"></i>Search Results</h3>
+                <p class="mb-0">{{ flights|length }} flights found from <strong>{{ form.cleaned_data.origin.city }}</strong> to <strong>{{ form.cleaned_data.destination.city }}</strong> for <strong>{{ form.cleaned_data.departure_date|date:"d/m/Y" }}</strong></p>
+            </div>
+            
+            <div class="mb-4">
+                <span class="filter-badge"><i class="fas fa-calendar-alt me-1"></i> {{ form.cleaned_data.departure_date|date:"d/m/Y" }}</span>
+                <span class="filter-badge"><i class="fas fa-users me-1"></i> {{ form.cleaned_data.passengers }} passenger(s)</span>
+                <span class="filter-badge"><i class="fas fa-flag me-1"></i> {{ form.cleaned_data.origin.country }}</span>
+                <span class="filter-badge"><i class="fas fa-map-marker-alt me-1"></i> {{ form.cleaned_data.destination.country }}</span>
+            </div>
+            
+            {% for flight in flights %}
+            <div class="card mb-4 shadow-sm flight-card animated-result delay-{{ forloop.counter0 }}">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if flight.aircraft.aircraft_type.category == 'JET' %}
+                                    <i class="fas fa-plane vehicle-icon"></i>
+                                    {% elif flight.aircraft.aircraft_type.category == 'HELICOPTER' %}
+                                    <i class="fas fa-helicopter vehicle-icon"></i>
+                                    {% else %}
+                                    <i class="fas fa-plane vehicle-icon"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-0">{{ flight.aircraft.aircraft_type.name }}</h5>
+                                    <p class="card-text text-muted">{{ flight.aircraft.aircraft_type.get_category_display }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column align-items-center">
+                                <h5 class="mb-0 fw-bold">{{ flight.departure_time|date:"H:i" }}</h5>
+                                <p class="mb-0"><strong>{{ flight.origin.city }}</strong></p>
+                                <small class="text-muted">{{ flight.departure_time|date:"d/m/Y" }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <div class="flight-path"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column align-items-center">
+                                <h5 class="mb-0 fw-bold">{{ flight.arrival_time|date:"H:i" }}</h5>
+                                <p class="mb-0"><strong>{{ flight.destination.city }}</strong></p>
+                                <small class="text-muted">{{ flight.arrival_time|date:"d/m/Y" }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <div class="price-tag mb-3">${{ flight.price|intcomma }}</div>
+                            <p class="mb-2">
+                                <i class="fas fa-chair me-1"></i> {{ flight.available_seats }} seats
+                            </p>
+                            <a href="{% url 'flights:flight_detail' flight.id %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-info-circle me-1"></i> View details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% else %}
+            <div class="empty-state animated-result">
+                <i class="fas fa-search-minus mb-4"></i>
+                <h3 class="text-purple mb-3">No flights found</h3>
+                <p class="mb-5 text-muted">There are no flights available for the selected criteria.</p>
+                <div class="row justify-content-center g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm suggestion-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-calendar-alt mb-3 icon-feature"></i>
+                                <h5 class="mb-3">Change the date</h5>
+                                <p class="text-muted">Try with a different nearby date</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm suggestion-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-map-marker-alt mb-3 icon-feature"></i>
+                                <h5 class="mb-3">Change the destination</h5>
+                                <p class="text-muted">Explore other exclusive destinations</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm suggestion-card">
+                            <div class="card-body text-center p-4">
+                                <i class="fas fa-users mb-3 icon-feature"></i>
+                                <h5 class="mb-3">Adjust passengers</h5>
+                                <p class="text-muted">Some flights have limited capacity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mejorar selects
+        const selects = document.querySelectorAll('select.form-select');
+        selects.forEach(select => {
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    this.classList.add('border-primary');
+                } else {
+                    this.classList.remove('border-primary');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

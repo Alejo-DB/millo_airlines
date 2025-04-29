@@ -1,0 +1,67 @@
+{% extends "flights/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block page_title %}Administrar Vuelos{% endblock %}
+{% block header_title %}Administrar Vuelos{% endblock %}
+
+{% block flights_content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Lista de Vuelos</h2>
+        <a href="{% url 'flights:admin_flight_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Vuelo
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Fecha/Hora Salida</th>
+                    <th>Fecha/Hora Llegada</th>
+                    <th>Avión</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <tr>
+                    <td>MA{{ flight.id }}</td>
+                    <td>{{ flight.origin.name }} ({{ flight.origin.city|slice:":3"|upper }})</td>
+                    <td>{{ flight.destination.name }} ({{ flight.destination.city|slice:":3"|upper }})</td>
+                    <td>{{ flight.departure_time|date:"d/m/Y H:i" }}</td>
+                    <td>{{ flight.arrival_time|date:"d/m/Y H:i" }}</td>
+                    <td>{{ flight.aircraft.aircraft_type.name }}</td>
+                    <td>${{ flight.price|intcomma }}</td>
+                    <td>
+                        <span class="badge {% if flight.status == 'SCHEDULED' %}bg-primary{% elif flight.status == 'CONFIRMED' %}bg-warning{% elif flight.status == 'IN_PROGRESS' %}bg-info{% elif flight.status == 'COMPLETED' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ flight.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'flights:admin_flight_edit' flight.id %}" class="btn btn-sm btn-outline-primary" title="Editar vuelo">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'flights:admin_flight_delete' flight.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar vuelo">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">No hay vuelos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 
