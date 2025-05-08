@@ -54,9 +54,13 @@ EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password
 DEFAULT_FROM_EMAIL=your-email@gmail.com
 ```
+```bash
 pip install reportlab
+```
+aplly this shi
+```bash
 python -c "import secrets; print(secrets.token_hex(32))"
-
+```
 
 5. Apply migrations:
 ```bash
