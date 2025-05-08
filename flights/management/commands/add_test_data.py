@@ -41,90 +41,114 @@ class Command(BaseCommand):
         self.stdout.write('Adding destinations...')
         
         destinations = [
-            # Colombia
+            # Aeropuertos de lujo
             {
-                'name': 'Aeropuerto El Dorado',
-                'city': 'Bogotá',
-                'country': 'Colombia',
-                'description': 'Principal aeropuerto de Colombia, hub internacional.',
+                'name': 'Dubai International Private Terminal',
+                'city': 'Dubai',
+                'country': 'Emiratos Árabes Unidos',
+                'description': 'Terminal privada de última generación con servicios VIP, salones exclusivos y transferencia directa en Rolls-Royce.',
+                'image_source': 'img/airports/dubai_private_terminal.jpg',
+                'image_dest': 'airports/dubai_private_terminal.jpg',
                 'is_active': True,
             },
             {
-                'name': 'Aeropuerto Internacional Rafael Núñez',
-                'city': 'Cartagena',
-                'country': 'Colombia',
-                'description': 'Aeropuerto que sirve a la ciudad turística de Cartagena.',
+                'name': 'Monaco Heliport',
+                'city': 'Monte Carlo',
+                'country': 'Mónaco',
+                'description': 'Helipuerto exclusivo con acceso directo al Principado, servicios VIP y conexiones con jets privados.',
+                'image_source': 'img/airports/monaco_heliport.jpg',
+                'image_dest': 'airports/monaco_heliport.jpg',
                 'is_active': True,
             },
             {
-                'name': 'Aeropuerto Internacional José María Córdova',
-                'city': 'Medellín',
-                'country': 'Colombia',
-                'description': 'Principal aeropuerto que sirve a la ciudad de Medellín.',
+                'name': 'Male Private Jet Terminal',
+                'city': 'Malé',
+                'country': 'Maldivas',
+                'description': 'Terminal exclusiva con acceso directo a hidroaviones y yates privados para las islas resort.',
+                'image_source': 'img/airports/male_private_terminal.jpg',
+                'image_dest': 'airports/male_private_terminal.jpg',
                 'is_active': True,
             },
-            # International
             {
-                'name': 'Aeropuerto Internacional de Miami',
-                'city': 'Miami',
+                'name': 'Santorini Private Aviation',
+                'city': 'Santorini',
+                'country': 'Grecia',
+                'description': 'Terminal privada con vistas al mar Egeo, servicios personalizados y transfers exclusivos.',
+                'image_source': 'img/airports/santorini_private.jpg',
+                'image_dest': 'airports/santorini_private.jpg',
+                'is_active': True,
+            },
+            {
+                'name': 'Bora Bora Airport VIP',
+                'city': 'Bora Bora',
+                'country': 'Polinesia Francesa',
+                'description': 'Terminal VIP con acceso directo a resorts de lujo y servicios personalizados.',
+                'image_source': 'img/airports/bora_bora_vip.jpg',
+                'image_dest': 'airports/bora_bora_vip.jpg',
+                'is_active': True,
+            },
+            {
+                'name': 'Naples International Private Aviation',
+                'city': 'Nápoles',
+                'country': 'Italia',
+                'description': 'Terminal privada con acceso directo a la Costa Amalfitana, servicios VIP y transfers en helicóptero.',
+                'image_source': 'img/airports/naples_private.jpg',
+                'image_dest': 'airports/naples_private.jpg',
+                'is_active': True,
+            },
+            {
+                'name': 'St. Moritz Samedan Airport',
+                'city': 'St. Moritz',
+                'country': 'Suiza',
+                'description': 'Aeropuerto privado de alta montaña con servicios exclusivos y transfers directos a resorts.',
+                'image_source': 'img/airports/st_moritz_samedan.jpg',
+                'image_dest': 'airports/st_moritz_samedan.jpg',
+                'is_active': True,
+            },
+            {
+                'name': 'Maui Private Terminal',
+                'city': 'Maui',
                 'country': 'Estados Unidos',
-                'description': 'Uno de los aeropuertos más transitados para viajes entre América Latina y Estados Unidos.',
+                'description': 'Terminal exclusiva con servicios VIP y acceso directo a resorts de lujo.',
+                'image_source': 'img/airports/maui_private.jpg',
+                'image_dest': 'airports/maui_private.jpg',
                 'is_active': True,
             },
             {
-                'name': 'Aeropuerto Internacional Benito Juárez',
-                'city': 'Ciudad de México',
-                'country': 'México',
-                'description': 'Principal aeropuerto de México y hub para América Latina.',
+                'name': 'Seychelles VIP Terminal',
+                'city': 'Mahé',
+                'country': 'Seychelles',
+                'description': 'Terminal privada con servicios personalizados y transfers directos a islas privadas.',
+                'image_source': 'img/airports/seychelles_vip.jpg',
+                'image_dest': 'airports/seychelles_vip.jpg',
                 'is_active': True,
             },
             {
-                'name': 'Aeropuerto Internacional de Tocumen',
-                'city': 'Panamá',
-                'country': 'Panamá',
-                'description': 'Hub importante que conecta América del Norte y del Sur.',
+                'name': 'Aspen Private Aviation Terminal',
+                'city': 'Aspen',
+                'country': 'Estados Unidos',
+                'description': 'FBO de lujo con servicios premium y acceso directo a las pistas de esquí.',
+                'image_source': 'img/airports/aspen_private.jpg',
+                'image_dest': 'airports/aspen_private.jpg',
                 'is_active': True,
-            },
-            {
-                'name': 'Aeropuerto Internacional de Madrid Barajas',
-                'city': 'Madrid',
-                'country': 'España',
-                'description': 'Principal aeropuerto de España y conexión con Europa.',
-                'is_active': True,
-            },
-            {
-                'name': 'Aeropuerto Internacional de París-Charles de Gaulle',
-                'city': 'París',
-                'country': 'Francia',
-                'description': 'Uno de los aeropuertos más importantes de Europa.',
-                'is_active': True,
-            },
-            {
-                'name': 'Aeropuerto Internacional de Buenos Aires Ministro Pistarini',
-                'city': 'Buenos Aires',
-                'country': 'Argentina',
-                'description': 'Principal aeropuerto de Argentina.',
-                'is_active': True,
-            },
-            {
-                'name': 'Aeropuerto Internacional de Santiago',
-                'city': 'Santiago',
-                'country': 'Chile',
-                'description': 'Principal aeropuerto de Chile y puerta de entrada a la región.',
-                'is_active': True,
-            },
+            }
         ]
         
+        # Mantener los destinos existentes y agregar los nuevos
+        existing_destinations = list(Destination.objects.values_list('name', flat=True))
+        
         for dest_data in destinations:
-            destination, created = Destination.objects.get_or_create(
-                name=dest_data['name'],
-                defaults=dest_data
-            )
-            
-            if created:
-                self.stdout.write(self.style.SUCCESS(f'Added destination: {destination.name}'))
-            else:
-                self.stdout.write(f'Destination already exists: {destination.name}')
+            if dest_data['name'] not in existing_destinations:
+                # Copy image file if source and destination are specified
+                if 'image_source' in dest_data and 'image_dest' in dest_data:
+                    image_source = dest_data.pop('image_source')
+                    image_dest = dest_data.pop('image_dest')
+                    
+                    if self.copy_image(image_source, image_dest):
+                        dest_data['image'] = image_dest
+                
+                destination = Destination.objects.create(**dest_data)
+                self.stdout.write(self.style.SUCCESS(f'Added airport destination: {destination.name}'))
     
     def add_aircraft_types(self):
         self.stdout.write('Adding aircraft types...')
