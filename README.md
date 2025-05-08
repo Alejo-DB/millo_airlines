@@ -23,7 +23,7 @@ A Django-based airline booking system that allows users to search, book, and man
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/millo_airlines.git
+git clone https://github.com/Alejo-DB/millo_airlines.git
 cd millo_airlines
 ```
 
@@ -54,6 +54,9 @@ EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password
 DEFAULT_FROM_EMAIL=your-email@gmail.com
 ```
+pip install reportlab
+python -c "import secrets; print(secrets.token_hex(32))"
+
 
 5. Apply migrations:
 ```bash
